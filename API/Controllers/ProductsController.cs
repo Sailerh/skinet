@@ -6,6 +6,7 @@ using Infrastructure.Data;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Core.Interfaces;
 
 namespace API.Controllers
 {
@@ -13,16 +14,16 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
-        private readonly StoreContext _context;
-        public ProductsController(StoreContext context)
+        private readonly IProductRepository _repo;
+        public ProductsController(IProductRepository repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Product>>> GetProducts()
         {
-            var products = await _context.Products.ToListAsync();
+            var products = await _repo.GetProductsAsync();
             return Ok(products);
         }
 
@@ -31,8 +32,22 @@ namespace API.Controllers
         {
             // var product = await _context.Products.Where(x => x.Id == id).FirstOrDefaultAsync();
             // return Ok(product);
-            return await _context.Products.FindAsync(id);
-        }        
+            return await _repo.GetProductByIdAsync(id);
+        }    
+
+        [HttpGet("brands")]
+        public async Task<ActionResult<List<Product>>> GetProductBrands()
+        {
+            var brands = await _repo.GetProductBrandsAsync();
+            return Ok(brands);
+        }   
+
+        [HttpGet("types")]
+        public async Task<ActionResult<List<Product>>> GetProductTypes()
+        {
+            var types = await _repo.GetProductTypesAsync();
+            return Ok(types);
+        }                      
         
     }
 }
